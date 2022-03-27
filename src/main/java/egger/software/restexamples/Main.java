@@ -12,12 +12,16 @@ import java.util.logging.Logger;
 public class Main {
     private static final Logger logger = Logger.getLogger(Main.class.getName());
 
+    public static Server startServer(int port) {
+        URI baseUri = UriBuilder.fromUri("http://localhost").port(port).build();
+        ResourceConfig config = ResourceConfig.forApplicationClass(Application.class);
+        return JettyHttpContainerFactory.createServer(baseUri, config);
+    }
+
     public static void main(String[] args) {
         
         try {
-            URI baseUri = UriBuilder.fromUri("http://localhost").port(8090).build();
-            ResourceConfig config = ResourceConfig.forApplicationClass(HelloApplication.class);
-            Server server = JettyHttpContainerFactory.createServer(baseUri, config);
+            Server server = startServer(8090);
 
             Runtime.getRuntime().addShutdownHook(new Thread(() -> {
                 try {
