@@ -1,5 +1,6 @@
 package egger.software.restexamples;
 
+import egger.software.restexamples.repository.Database;
 import org.eclipse.jetty.server.Server;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -14,6 +15,8 @@ import javax.ws.rs.core.Response;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class MainSystemTests {
 
@@ -23,7 +26,9 @@ public class MainSystemTests {
 
     @BeforeClass
     public static void startServer() {
-        server = Main.startServer(port);
+        Database database = mock(Database.class);
+        when(database.get()).thenReturn("[{\"name\":\"task1\"},{\"name\":\"task2\"}]");
+        server = Main.startServer(port, database);
         client = ClientBuilder.newClient();
     }
 
@@ -34,19 +39,16 @@ public class MainSystemTests {
     }
 
     @Test
-    public void it_should_start_the_server_and_make_the_REST_service_available() {
+    public void it_can_fetch_tasks() {
         // given
-        WebTarget target = client
-                .target("http://localhost:" + port)
-                .path("hello-world")
-                .queryParam("name", "Alexander");
+        WebTarget target = client.target("http://localhost:" + port).path("tasks");
 
         // when
         Response response = target.request(MediaType.APPLICATION_JSON).get();
 
         // then
         assertThat(response.getStatus(), is(equalTo(200)));
-        assertThat(response.readEntity(String.class), is(equalTo("{\"count\":1,\"value\":\"Hello, Alexander!\"}")));
+        assertThat(response.readEntity(String.class), is(equalTo("[{\"name\":\"task1\"},{\"name\":\"task2\"}]")));
 
     }
 

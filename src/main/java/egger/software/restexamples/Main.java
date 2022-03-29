@@ -1,5 +1,6 @@
 package egger.software.restexamples;
 
+import egger.software.restexamples.repository.Database;
 import org.eclipse.jetty.server.Server;
 import org.glassfish.jersey.jetty.JettyHttpContainerFactory;
 import org.glassfish.jersey.server.ResourceConfig;
@@ -12,16 +13,17 @@ import java.util.logging.Logger;
 public class Main {
     private static final Logger logger = Logger.getLogger(Main.class.getName());
 
-    public static Server startServer(int port) {
+    public static Server startServer(int port, Database databaseOverride) {
         URI baseUri = UriBuilder.fromUri("http://localhost").port(port).build();
-        ResourceConfig config = ResourceConfig.forApplicationClass(Application.class);
+        Application application = new Application(databaseOverride);
+        ResourceConfig config = ResourceConfig.forApplication(application);
         return JettyHttpContainerFactory.createServer(baseUri, config);
     }
 
     public static void main(String[] args) {
         
         try {
-            Server server = startServer(8090);
+            Server server = startServer(8090, null);
 
             Runtime.getRuntime().addShutdownHook(new Thread(() -> {
                 try {
