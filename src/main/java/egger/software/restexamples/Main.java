@@ -16,7 +16,7 @@ public class Main {
         
         try {
             URI baseUri = UriBuilder.fromUri("http://localhost").port(8090).build();
-            ResourceConfig config = new ResourceConfig(HelloResource.class);
+            ResourceConfig config = ResourceConfig.forApplicationClass(HelloApplication.class);
             Server server = JettyHttpContainerFactory.createServer(baseUri, config);
 
             Runtime.getRuntime().addShutdownHook(new Thread(() -> {
