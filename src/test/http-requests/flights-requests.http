@@ -1,0 +1,60 @@
+###
+GET http://localhost/flights
+Accept: application/json
+
+<> 2022-04-03T142239.200.json
+<> 2022-04-03T110700.200.json
+<> 2022-04-03T110641.200.json
+<> 2022-04-03T110631.200.json
+<> 2022-04-03T110606.200.json
+<> 2022-04-03T110600.200.json
+<> 2022-04-03T103815.200.json
+<> 2022-04-03T103302.200.json
+
+###
+GET http://localhost/flights/1
+Accept: application/json
+
+<> 2022-04-03T103320.200.json
+
+###
+POST http://localhost/flights
+Content-Type: application/json
+Accept: application/json
+
+{
+  "number": "OS1234",
+  "from": "FRA",
+  "to": "DUS"
+
+}
+
+<> 2022-04-03T110654.200.json
+<> 2022-04-03T110616.200.json
+
+###
+PUT http://localhost/flights/4
+Content-Type: application/json
+Accept: application/json
+
+{
+  "number": "OS1234",
+  "from": "FRA",
+  "to": "BER"
+
+}
+
+###
+GET http://localhost/flights/flight?number=OS1234
+Accept: application/json
+
+<> 2022-04-03T110625.200.json
+<> 2022-04-03T110622.200.json
+<> 2022-04-03T110546.200.json
+
+###
+DELETE http://localhost/flights/4
+
+<> 2022-04-03T103729.200.json
+<> 2022-04-03T103521.200.json
+
