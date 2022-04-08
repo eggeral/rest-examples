@@ -20,15 +20,15 @@ public class PassengersResource {
     @GET
     public List<Passenger> all() {
         return Arrays.asList(
-                new Passenger(1L, "Harald Test"),
-                new Passenger(2L, "Max Muster")
+                new Passenger(1L, "Harald Test", "OS1234"),
+                new Passenger(2L, "Max Muster", "LH5678")
         );
     }
 
     @GET
     @Path("{id}")
     public Passenger one(@PathParam("id") Long id) {
-        return new Passenger(1L, "Harald Test");
+        return new Passenger(1L, "Harald Test", "OS1234");
     }
 
 

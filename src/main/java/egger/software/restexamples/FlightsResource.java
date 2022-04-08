@@ -1,10 +1,19 @@
 package egger.software.restexamples;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import egger.software.restexamples.entity.Flight;
 import egger.software.restexamples.repository.FlightsRepository;
 
 import javax.inject.Inject;
 import javax.ws.rs.*;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.UriInfo;
+import java.net.URL;
 import java.util.List;
 import java.util.Objects;
 
@@ -54,6 +63,30 @@ public class FlightsResource {
     @Path("{id}/passengers")
     public PassengersResource passengers(@PathParam("id") Long id) {
         return new PassengersResource(id);
+    }
+
+    private final ObjectMapper objectMapper = new ObjectMapper();
+
+    @POST
+    @Path("plainjackson")
+    public Response getFlightUsingPlainJson(String flightString) throws JsonProcessingException {
+        JsonNode newFlightJson = objectMapper.readTree(flightString);
+        Flight newFlight = new Flight(
+                null,
+                newFlightJson.get("number").textValue(),
+                newFlightJson.get("from").textValue(),
+                newFlightJson.get("to").textValue()
+        );
+        Flight createdFlight = repository.add(newFlight);
+        ObjectNode createdFlightJson = objectMapper.createObjectNode();
+        createdFlightJson.put("id", createdFlight.getId());
+        createdFlightJson.put("number", createdFlight.getNumber());
+        createdFlightJson.put("from", createdFlight.getFrom());
+        createdFlightJson.put("to", createdFlight.getTo());
+        return Response.ok(
+                objectMapper.writeValueAsString(createdFlightJson),
+                MediaType.APPLICATION_JSON
+        ).build();
     }
 
 }

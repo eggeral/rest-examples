@@ -21,7 +21,6 @@ public class Application extends ResourceConfig {
         register(FlightNumberAlreadyExistsExceptionMapper.class);
         register(FlightsResource.class);
         register(TicketsResource.class);
-        register(AnnotationsExamplesResource.class);
         register(new AbstractBinder() {
             @Override
             protected void configure() {
