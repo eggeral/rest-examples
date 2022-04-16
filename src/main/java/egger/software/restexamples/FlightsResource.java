@@ -60,33 +60,4 @@ public class FlightsResource {
         return repository.find(flight -> Objects.equals(flight.getNumber(), number));
     }
 
-    @Path("{id}/passengers")
-    public PassengersResource passengers(@PathParam("id") Long id) {
-        return new PassengersResource(id);
-    }
-
-    private final ObjectMapper objectMapper = new ObjectMapper();
-
-    @POST
-    @Path("plainjackson")
-    public Response getFlightUsingPlainJson(String flightString) throws JsonProcessingException {
-        JsonNode newFlightJson = objectMapper.readTree(flightString);
-        Flight newFlight = new Flight(
-                null,
-                newFlightJson.get("number").textValue(),
-                newFlightJson.get("from").textValue(),
-                newFlightJson.get("to").textValue()
-        );
-        Flight createdFlight = repository.add(newFlight);
-        ObjectNode createdFlightJson = objectMapper.createObjectNode();
-        createdFlightJson.put("id", createdFlight.getId());
-        createdFlightJson.put("number", createdFlight.getNumber());
-        createdFlightJson.put("from", createdFlight.getFrom());
-        createdFlightJson.put("to", createdFlight.getTo());
-        return Response.ok(
-                objectMapper.writeValueAsString(createdFlightJson),
-                MediaType.APPLICATION_JSON
-        ).build();
-    }
-
 }
