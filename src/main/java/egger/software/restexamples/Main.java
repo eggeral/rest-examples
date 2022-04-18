@@ -2,11 +2,13 @@ package egger.software.restexamples;
 
 import egger.software.restexamples.entity.Flight;
 import org.eclipse.jetty.server.Server;
-import org.glassfish.jersey.jetty.JettyHttpContainerFactory;
+import org.eclipse.jetty.servlet.DefaultServlet;
+import org.eclipse.jetty.servlet.ServletContextHandler;
+import org.eclipse.jetty.servlet.ServletHolder;
 import org.glassfish.jersey.server.ResourceConfig;
+import org.glassfish.jersey.servlet.ServletContainer;
 
-import javax.ws.rs.core.UriBuilder;
-import java.net.URI;
+import java.net.URL;
 import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Level;
@@ -15,11 +17,27 @@ import java.util.logging.Logger;
 public class Main {
     private static final Logger logger = Logger.getLogger(Main.class.getName());
 
-    public static Server startServer(int port, List<Flight> initialFlights) {
-        URI baseUri = UriBuilder.fromUri("http://localhost").port(port).build();
+    public static Server startServer(int port, List<Flight> initialFlights) throws Exception {
         Application application = new Application(initialFlights);
         ResourceConfig config = ResourceConfig.forApplication(application);
-        return JettyHttpContainerFactory.createServer(baseUri, config);
+
+        ServletContextHandler contextHandler = new ServletContextHandler();
+        contextHandler.setContextPath("/");
+
+        DefaultServlet staticResources = new DefaultServlet();
+        ServletHolder staticResourcesHolder = new ServletHolder("static", staticResources);
+        URL resourcesUri = Main.class.getClassLoader().getResource("webapp");
+        staticResourcesHolder.setInitParameter("resourceBase", resourcesUri.toString());
+        contextHandler.addServlet(staticResourcesHolder, "/swagger-ui/*");
+
+        ServletContainer jerseyServlet = new ServletContainer(config);
+        ServletHolder jerseyServletHolder = new ServletHolder("jersey", jerseyServlet);
+        contextHandler.addServlet(jerseyServletHolder, "/api/*");
+
+        Server server = new Server(port);
+        server.setHandler(contextHandler);
+        server.start();
+        return server;
     }
 
     public static void main(String[] args) {
@@ -30,6 +48,7 @@ public class Main {
                     new Flight(3L, "KM6712", "MUN", "FRA")
             );
             Server server = startServer(80, initialFlights);
+
 
             Runtime.getRuntime().addShutdownHook(new Thread(() -> {
                 try {

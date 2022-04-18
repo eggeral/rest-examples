@@ -22,7 +22,7 @@ public class MainSystemTests {
     private static final int port = 8091;
 
     @Before
-    public void startServer() {
+    public void startServer() throws Exception {
         server = Main.startServer(port, Collections.emptyList());
         client = ClientBuilder.newClient();
     }
@@ -37,7 +37,7 @@ public class MainSystemTests {
     public void flights_can_be_created_read_updated_and_deleted() {
 
         // given
-        WebTarget target = client.target("http://localhost:" + port).path("flights");
+        WebTarget target = client.target("http://localhost:" + port).path("/api/flights");
 
         // when
         // GET ALL
@@ -120,7 +120,7 @@ public class MainSystemTests {
     @Test
     public void a_flight_with_the_same_number_can_not_be_created_twice() {
         // given
-        WebTarget target = client.target("http://localhost:" + port).path("flights");
+        WebTarget target = client.target("http://localhost:" + port).path("/api/flights");
         target.request(MediaType.APPLICATION_JSON).post(Entity.entity("" +
                 "{" +
                 "  \"number\": \"OS1234\"," +
@@ -140,57 +140,6 @@ public class MainSystemTests {
         assertThat(response.getStatus(), is(equalTo(409)));
         assertThat(response.readEntity(String.class), is(equalTo(
                 "Flight with number OS1234 already exists"
-        )));
-    }
-
-
-    @Test
-    public void tickets_can_be_fetched_as_json() {
-        // given
-        WebTarget target = client.target("http://localhost:" + port).path("tickets");
-
-        // when
-        Response response = target.path("1").request(MediaType.APPLICATION_JSON).get();
-
-        // then
-        assertThat(response.getStatus(), is(equalTo(200)));
-        assertThat(response.readEntity(String.class), is(equalTo(
-                "{\"id\":1}"
-        )));
-    }
-
-    @Test
-    public void tickets_can_be_downloaded_as_pdf() {
-        // given
-        WebTarget target = client.target("http://localhost:" + port).path("tickets");
-
-        // when
-        Response response = target.path("1").request(MediaType.APPLICATION_OCTET_STREAM).get();
-
-        // then
-        assertThat(response.getStatus(), is(equalTo(200)));
-        assertThat(response.readEntity(String.class), is(startsWith(
-                "%PDF"
-        )));
-    }
-
-    @Test
-    public void add_flight_using_plain_jackson_example() {
-        // given
-        WebTarget target = client.target("http://localhost:" + port).path("flights/plainjackson");
-
-        // when
-        Response response = target.request(MediaType.APPLICATION_JSON).post(Entity.entity("" +
-                "{" +
-                "  \"number\": \"OS1234\"," +
-                "  \"from\": \"FRA\"," +
-                "  \"to\": \"DUS\"" +
-                "}", MediaType.APPLICATION_JSON_TYPE));
-
-        // then
-        assertThat(response.getStatus(), is(equalTo(200)));
-        assertThat(response.readEntity(String.class), is(equalTo(
-                "{\"id\":1,\"number\":\"OS1234\",\"from\":\"FRA\",\"to\":\"DUS\"}"
         )));
     }
 }
