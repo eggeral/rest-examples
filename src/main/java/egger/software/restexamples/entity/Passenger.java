@@ -3,15 +3,15 @@ package egger.software.restexamples.entity;
 public class Passenger implements Person {
     private Long id;
     private String name;
-    private String flightNumber;
+    private Long flightId;
 
     public Passenger() {
     }
 
-    public Passenger(Long id, String name, String flightNumber) {
+    public Passenger(Long id, String name, Long flightId) {
         this.id = id;
         this.name = name;
-        this.flightNumber = flightNumber;
+        this.flightId = flightId;
     }
 
     @Override
@@ -24,8 +24,19 @@ public class Passenger implements Person {
         return name;
     }
 
-    public String getFlightNumber() {
-        return flightNumber;
+    public Long getFlightId() {
+        return flightId;
+    }
+
+    public Passenger copy() {
+        return copy(null, null, null);
+    }
+
+    public Passenger copy(Long newId, String newName, Long newFlightId) {
+        Long id = newId != null ? newId : this.id;
+        String name = newName != null ? newName : this.name;
+        Long flightId = newFlightId != null ? newFlightId : this.flightId;
+        return new Passenger(id, name, flightId);
     }
 
     @Override
@@ -37,14 +48,14 @@ public class Passenger implements Person {
 
         if (id != null ? !id.equals(passenger.id) : passenger.id != null) return false;
         if (name != null ? !name.equals(passenger.name) : passenger.name != null) return false;
-        return flightNumber != null ? flightNumber.equals(passenger.flightNumber) : passenger.flightNumber == null;
+        return flightId != null ? flightId.equals(passenger.flightId) : passenger.flightId == null;
     }
 
     @Override
     public int hashCode() {
         int result = id != null ? id.hashCode() : 0;
         result = 31 * result + (name != null ? name.hashCode() : 0);
-        result = 31 * result + (flightNumber != null ? flightNumber.hashCode() : 0);
+        result = 31 * result + (flightId != null ? flightId.hashCode() : 0);
         return result;
     }
 
@@ -53,7 +64,7 @@ public class Passenger implements Person {
         return "Passenger{" +
                 "id=" + id +
                 ", name='" + name + '\'' +
-                ", flightNumber='" + flightNumber + '\'' +
+                ", flightId=" + flightId +
                 '}';
     }
 }

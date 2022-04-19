@@ -45,17 +45,6 @@ dependencies {
     implementation("com.fasterxml.jackson.jaxrs:jackson-jaxrs-xml-provider:2.12.2)")
     implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.12.2)")
 
-    implementation 'io.swagger:swagger-annotations:1.5.24'
-    implementation "com.google.code.findbugs:jsr305:3.0.2"
-    implementation 'com.squareup.okhttp3:okhttp:4.9.1'
-    implementation 'com.squareup.okhttp3:logging-interceptor:4.9.1'
-    implementation 'com.google.code.gson:gson:2.8.6'
-    implementation 'io.gsonfire:gson-fire:1.8.4'
-    implementation 'org.openapitools:jackson-databind-nullable:0.2.1'
-    implementation "jakarta.annotation:jakarta.annotation-api:2.0.0"
-    implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.10'
-
-
     testImplementation('junit:junit:4.13.2')
     testImplementation("org.hamcrest:hamcrest-all:1.3")
     testRuntimeOnly("org.junit.vintage:junit-vintage-engine:5.8.2")
@@ -66,25 +55,6 @@ dependencies {
     testImplementation"org.glassfish.jersey.test-framework.providers:jersey-test-framework-provider-inmemory:${jerseyVersion}"
 }
 
-sourceSets.main.java.srcDirs += "$buildDir/generated/src/main/java"
-
 test {
     useJUnitPlatform()
 }
-
-task buildClient(type: org.openapitools.generator.gradle.plugin.tasks.GenerateTask){
-    generatorName = "java"
-    inputSpec = "$rootDir/openapi.json".toString()
-    outputDir = "$buildDir/generated/".toString()
-    apiPackage = "egger.software.restexamples.api"
-    invokerPackage = "egger.software.restexamples.invoker"
-    modelPackage = "egger.software.restexamples.model"
-    configOptions = [
-            dateLibrary: "java8",
-    ]
-    globalProperties = [
-            modelDocs: "false"
-    ]
-}
-
-compileJava.dependsOn buildClient

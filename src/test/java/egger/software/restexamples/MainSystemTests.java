@@ -1,11 +1,12 @@
 package egger.software.restexamples;
 
-import org.eclipse.jetty.http.MultiPartFormInputStream;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.eclipse.jetty.server.Server;
 import org.junit.*;
 
 import javax.ws.rs.client.*;
-import javax.ws.rs.core.Form;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
@@ -141,5 +142,39 @@ public class MainSystemTests {
         assertThat(response.readEntity(String.class), is(equalTo(
                 "Flight with number OS1234 already exists"
         )));
+    }
+
+    @Test
+    public void a_flight_contains_a_link_to_its_passengers() throws JsonProcessingException {
+        // given
+        ObjectMapper objectMapper = new ObjectMapper();
+        WebTarget target = client.target("http://localhost:" + port).path("/api/flights");
+        target.request(MediaType.APPLICATION_JSON).post(Entity.entity("" +
+                "{" +
+                "  \"number\": \"OS1234\"," +
+                "  \"from\": \"FRA\"," +
+                "  \"to\": \"DUS\"" +
+                "}", MediaType.APPLICATION_JSON_TYPE));
+
+        // when
+        Response response = target.request(MediaType.APPLICATION_JSON).get();
+        String responseString = response.readEntity(String.class);
+        JsonNode json = objectMapper.readTree(responseString);
+
+        // then
+        assertThat(response.getStatus(), is(equalTo(200)));
+        assertThat(responseString, is(equalTo(
+                "[" +
+                        "{" +
+                        "\"id\":1," +
+                        "\"number\":\"OS1234\"," +
+                        "\"from\":\"FRA\"," +
+                        "\"to\":\"DUS\"," +
+                        "\"passengersLink\":{\"uri\":\"1/passengers\",\"params\":{\"rel\":\"passengers\"},\"uriBuilder\":{\"absolute\":false},\"rels\":\"passengers\",\"title\":null,\"rels\":[\"passengers\"],\"type\":null}}" +
+                        "}" +
+                        "]"
+        )));
+        
+
     }
 }

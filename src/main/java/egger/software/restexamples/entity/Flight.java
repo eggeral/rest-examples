@@ -1,5 +1,8 @@
 package egger.software.restexamples.entity;
 
+
+import javax.ws.rs.core.Link;
+
 public class Flight {
     private Long id;
     private String number;
@@ -30,6 +33,10 @@ public class Flight {
 
     public String getTo() {
         return to;
+    }
+
+    public Link getPassengersLink() {
+        return Link.fromUri("{flightId}/passengers").rel("passengers").build(id);
     }
 
     public Flight copy() {
