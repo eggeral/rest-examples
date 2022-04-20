@@ -1,8 +1,25 @@
 package egger.software.restexamples.entity;
 
 
+import egger.software.restexamples.FlightsResource;
+import egger.software.restexamples.PassengersResource;
+import org.glassfish.jersey.linking.Binding;
+import org.glassfish.jersey.linking.InjectLink;
+import org.glassfish.jersey.linking.InjectLinks;
+
 import javax.ws.rs.core.Link;
 
+@InjectLinks({
+        @InjectLink(resource = PassengersResource.class, rel = "passengers"),
+        @InjectLink(
+                value = "flights/{flightId}/pilot",
+                bindings = {
+                        @Binding(name = "flightId", value = "${instance.id}")
+                },
+                rel = "pilot"
+        )
+}
+)
 public class Flight {
     private Long id;
     private String number;
@@ -19,6 +36,9 @@ public class Flight {
         this.to = to;
     }
 
+    @InjectLink(resource = PassengersResource.class)
+    public Link passengers;
+
     public Long getId() {
         return id;
     }
@@ -33,10 +53,6 @@ public class Flight {
 
     public String getTo() {
         return to;
-    }
-
-    public Link getPassengersLink() {
-        return Link.fromUri("{flightId}/passengers").rel("passengers").build(id);
     }
 
     public Flight copy() {

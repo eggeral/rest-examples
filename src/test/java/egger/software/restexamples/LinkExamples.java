@@ -18,7 +18,6 @@ import javax.ws.rs.core.Response;
 
 import java.util.Collections;
 
-import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 
@@ -41,7 +40,7 @@ public class LinkExamples {
     }
 
     @Test
-    public void programmatically_add_links_in_entities() throws JsonProcessingException {
+    public void declaratively_add_links_in_entities() throws JsonProcessingException {
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
         WebTarget target = client.target("http://localhost:" + port).path("/api/flights");
@@ -59,7 +58,7 @@ public class LinkExamples {
     }
 
     @Test
-    public void programmatically_add_links_in_headers() {
+    public void declaratively_add_links_in_headers() throws JsonProcessingException {
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
         WebTarget target = client.target("http://localhost:" + port).path("/api/flights");

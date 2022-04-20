@@ -3,6 +3,8 @@ package egger.software.restexamples;
 import egger.software.restexamples.entity.Flight;
 import egger.software.restexamples.repository.FlightsRepository;
 import egger.software.restexamples.repository.PassengersRepository;
+import org.glassfish.jersey.linking.Binding;
+import org.glassfish.jersey.linking.ProvideLink;
 
 import javax.inject.Inject;
 import javax.ws.rs.*;
@@ -33,15 +35,8 @@ public class FlightsResource {
     @Path("{id}")
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response one(@PathParam("id") Long id) {
-        return Response
-                .ok()
-                .links(
-                        Link.fromUri("{flightId}/passengers").rel("passengers").build(id),
-                        Link.fromUri("{flightId}/pilot").rel("pilot").build(id)
-                )
-                .entity(flightsRepository.findById(id))
-                .build();
+    public Flight one(@PathParam("id") Long id) {
+        return flightsRepository.findById(id);
     }
 
     @POST

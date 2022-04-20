@@ -17,6 +17,7 @@ ext {
     jerseyVersion = '2.34'
     swaggerVersion = '2.2.0'
     jettyVersion = '9.4.45.v20220203'
+    jacksonVersion = '2.12.2'
 }
 
 sourceCompatibility = '1.8'
@@ -42,10 +43,14 @@ dependencies {
 
     implementation("io.swagger.core.v3:swagger-jaxrs2:${swaggerVersion}")
 
-    implementation("com.fasterxml.jackson.jaxrs:jackson-jaxrs-xml-provider:2.12.2)")
-    implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.12.2)")
+    implementation("com.fasterxml.jackson.jaxrs:jackson-jaxrs-xml-provider:${jacksonVersion}")
+    implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:${jacksonVersion}")
 
-    testImplementation('junit:junit:4.13.2')
+    implementation("org.glassfish.jersey.ext:jersey-declarative-linking:${jerseyVersion}")
+    implementation("jakarta.el:jakarta.el-api:3.0.3")
+    implementation("org.glassfish:jakarta.el:3.0.4")
+
+    testImplementation("junit:junit:4.13.2")
     testImplementation("org.hamcrest:hamcrest-all:1.3")
     testRuntimeOnly("org.junit.vintage:junit-vintage-engine:5.8.2")
 

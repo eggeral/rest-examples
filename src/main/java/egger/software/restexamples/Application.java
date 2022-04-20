@@ -5,9 +5,8 @@ import egger.software.restexamples.entity.Flight;
 import egger.software.restexamples.repository.FlightsRepository;
 import egger.software.restexamples.repository.PassengersRepository;
 import io.swagger.v3.jaxrs2.integration.resources.OpenApiResource;
-import io.swagger.v3.oas.annotations.OpenAPIDefinition;
-import io.swagger.v3.oas.annotations.info.Info;
 import org.glassfish.jersey.internal.inject.AbstractBinder;
+import org.glassfish.jersey.linking.DeclarativeLinkingFeature;
 import org.glassfish.jersey.server.ResourceConfig;
 
 import javax.ws.rs.ApplicationPath;
@@ -42,6 +41,8 @@ public class Application extends ResourceConfig {
 
         register(OpenApiResource.class);
         register(OpenApiDefinition.class);
+
+        register(DeclarativeLinkingFeature.class);
     }
 
 }
