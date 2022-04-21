@@ -1,10 +1,15 @@
 package egger.software.restexamples;
 
 import egger.software.restexamples.entity.Flight;
+import org.eclipse.jetty.security.ConstraintSecurityHandler;
+import org.eclipse.jetty.security.HashLoginService;
+import org.eclipse.jetty.security.UserStore;
+import org.eclipse.jetty.security.authentication.BasicAuthenticator;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.servlet.DefaultServlet;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
+import org.eclipse.jetty.util.security.Credential;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.servlet.ServletContainer;
 
@@ -36,6 +41,20 @@ public class Main {
 
         Server server = new Server(port);
         server.setHandler(contextHandler);
+
+        HashLoginService loginService = new HashLoginService("MyRealm");
+        UserStore userStore = new UserStore();
+        userStore.addUser("admin", Credential.getCredential("secret"), new String[]{"Admin", "User"});
+        userStore.addUser("user", Credential.getCredential("secret"), new String[]{"User"});
+        loginService.setUserStore(userStore);
+        server.addBean(loginService);
+
+        ConstraintSecurityHandler securityHandler = new ConstraintSecurityHandler();
+        securityHandler.setAuthenticator(new BasicAuthenticator());
+        securityHandler.setLoginService(loginService);
+
+        contextHandler.setSecurityHandler(securityHandler);
+
         server.start();
         return server;
     }
@@ -48,7 +67,6 @@ public class Main {
                     new Flight(3L, "KM6712", "MUN", "FRA")
             );
             Server server = startServer(80, initialFlights);
-
 
             Runtime.getRuntime().addShutdownHook(new Thread(() -> {
                 try {

@@ -3,18 +3,17 @@ package egger.software.restexamples;
 import egger.software.restexamples.entity.Flight;
 import egger.software.restexamples.repository.FlightsRepository;
 import egger.software.restexamples.repository.PassengersRepository;
-import org.glassfish.jersey.linking.Binding;
-import org.glassfish.jersey.linking.ProvideLink;
 
+import javax.annotation.security.PermitAll;
+import javax.annotation.security.RolesAllowed;
 import javax.inject.Inject;
 import javax.ws.rs.*;
-import javax.ws.rs.core.Link;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
+import javax.ws.rs.core.*;
 import java.util.List;
 import java.util.Objects;
 
 @Path("/flights")
+@RolesAllowed("Admin")
 public class FlightsResource {
     private final FlightsRepository flightsRepository;
     private final PassengersRepository passengersRepository;
@@ -27,7 +26,9 @@ public class FlightsResource {
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public List<Flight> all() {
+    @PermitAll
+    public List<Flight> all(@Context SecurityContext securityContext) {
+        if (!securityContext.isUserInRole("User")) throw new WebApplicationException(Response.Status.NOT_FOUND);
         return flightsRepository.findAll();
     }
 
@@ -35,6 +36,8 @@ public class FlightsResource {
     @Path("{id}")
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
+    @PermitAll
+    @RolesAllowed("User")
     public Flight one(@PathParam("id") Long id) {
         return flightsRepository.findById(id);
     }
@@ -63,6 +66,7 @@ public class FlightsResource {
     @GET
     @Path("flight")
     @Produces(MediaType.APPLICATION_JSON)
+    @PermitAll
     public List<Flight> findByNumber(@QueryParam("number") String number) {
         return flightsRepository.find(flight -> Objects.equals(flight.getNumber(), number));
     }

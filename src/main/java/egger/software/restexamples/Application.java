@@ -8,6 +8,7 @@ import io.swagger.v3.jaxrs2.integration.resources.OpenApiResource;
 import org.glassfish.jersey.internal.inject.AbstractBinder;
 import org.glassfish.jersey.linking.DeclarativeLinkingFeature;
 import org.glassfish.jersey.server.ResourceConfig;
+import org.glassfish.jersey.server.filter.RolesAllowedDynamicFeature;
 
 import javax.ws.rs.ApplicationPath;
 import java.util.Collections;
@@ -43,6 +44,7 @@ public class Application extends ResourceConfig {
         register(OpenApiDefinition.class);
 
         register(DeclarativeLinkingFeature.class);
+        register(RolesAllowedDynamicFeature.class);
     }
 
 }
