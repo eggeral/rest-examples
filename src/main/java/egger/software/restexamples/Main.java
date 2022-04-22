@@ -1,14 +1,19 @@
 package egger.software.restexamples;
 
 import egger.software.restexamples.entity.Flight;
+import org.eclipse.jetty.security.ConstraintMapping;
 import org.eclipse.jetty.security.ConstraintSecurityHandler;
 import org.eclipse.jetty.security.HashLoginService;
 import org.eclipse.jetty.security.UserStore;
 import org.eclipse.jetty.security.authentication.BasicAuthenticator;
+import org.eclipse.jetty.security.openid.OpenIdAuthenticator;
+import org.eclipse.jetty.security.openid.OpenIdConfiguration;
+import org.eclipse.jetty.security.openid.OpenIdLoginService;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.servlet.DefaultServlet;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
+import org.eclipse.jetty.util.security.Constraint;
 import org.eclipse.jetty.util.security.Credential;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.servlet.ServletContainer;
@@ -26,7 +31,7 @@ public class Main {
         Application application = new Application(initialFlights);
         ResourceConfig config = ResourceConfig.forApplication(application);
 
-        ServletContextHandler contextHandler = new ServletContextHandler();
+        ServletContextHandler contextHandler = new ServletContextHandler(ServletContextHandler.SESSIONS);
         contextHandler.setContextPath("/");
 
         DefaultServlet staticResources = new DefaultServlet();
@@ -42,16 +47,30 @@ public class Main {
         Server server = new Server(port);
         server.setHandler(contextHandler);
 
-        HashLoginService loginService = new HashLoginService("MyRealm");
+        HashLoginService userRoleService = new HashLoginService("MyRealm");
         UserStore userStore = new UserStore();
-        userStore.addUser("admin", Credential.getCredential("secret"), new String[]{"Admin", "User"});
-        userStore.addUser("user", Credential.getCredential("secret"), new String[]{"User"});
-        loginService.setUserStore(userStore);
+        userStore.addUser("108167671479678514802", Credential.getCredential(""), new String[]{"Admin", "User"});
+        userRoleService.setUserStore(userStore);
+        OpenIdConfiguration openIdConfiguration = new OpenIdConfiguration(
+                "https://accounts.google.com",
+                "Google-OpenId-Credentials",
+                "Google-OpenId-Credentials"
+        );
+        OpenIdLoginService loginService = new OpenIdLoginService(openIdConfiguration, userRoleService);
         server.addBean(loginService);
 
+        ConstraintMapping constraintMapping = new ConstraintMapping();
+        Constraint constraint = new Constraint();
+        constraint.setName(Constraint.__OPENID_AUTH);
+        constraint.setRoles(new String[]{"User"});
+        constraint.setAuthenticate(true);
+        constraintMapping.setConstraint(constraint);
+        constraintMapping.setPathSpec("/api/*");
+
         ConstraintSecurityHandler securityHandler = new ConstraintSecurityHandler();
-        securityHandler.setAuthenticator(new BasicAuthenticator());
+        securityHandler.setAuthenticator(new OpenIdAuthenticator(openIdConfiguration, null));
         securityHandler.setLoginService(loginService);
+        securityHandler.addConstraintMapping(constraintMapping);
 
         contextHandler.setSecurityHandler(securityHandler);
 

@@ -36,6 +36,7 @@ dependencies {
 
     implementation("org.eclipse.jetty:jetty-server:${jettyVersion}")
     implementation("org.eclipse.jetty:jetty-servlet:${jettyVersion}")
+    implementation("org.eclipse.jetty:jetty-openid:${jettyVersion}")
 
     implementation("org.glassfish.jersey.containers:jersey-container-servlet:${jerseyVersion}")
     implementation("org.glassfish.jersey.media:jersey-media-json-jackson:${jerseyVersion}")
