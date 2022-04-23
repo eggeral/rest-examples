@@ -47,33 +47,6 @@ public class Main {
         Server server = new Server(port);
         server.setHandler(contextHandler);
 
-        HashLoginService userRoleService = new HashLoginService("MyRealm");
-        UserStore userStore = new UserStore();
-        userStore.addUser("108167671479678514802", Credential.getCredential(""), new String[]{"Admin", "User"});
-        userRoleService.setUserStore(userStore);
-        OpenIdConfiguration openIdConfiguration = new OpenIdConfiguration(
-                "https://accounts.google.com",
-                "Google-OpenId-Credentials",
-                "Google-OpenId-Credentials"
-        );
-        OpenIdLoginService loginService = new OpenIdLoginService(openIdConfiguration, userRoleService);
-        server.addBean(loginService);
-
-        ConstraintMapping constraintMapping = new ConstraintMapping();
-        Constraint constraint = new Constraint();
-        constraint.setName(Constraint.__OPENID_AUTH);
-        constraint.setRoles(new String[]{"User"});
-        constraint.setAuthenticate(true);
-        constraintMapping.setConstraint(constraint);
-        constraintMapping.setPathSpec("/api/*");
-
-        ConstraintSecurityHandler securityHandler = new ConstraintSecurityHandler();
-        securityHandler.setAuthenticator(new OpenIdAuthenticator(openIdConfiguration, null));
-        securityHandler.setLoginService(loginService);
-        securityHandler.addConstraintMapping(constraintMapping);
-
-        contextHandler.setSecurityHandler(securityHandler);
-
         server.start();
         return server;
     }
