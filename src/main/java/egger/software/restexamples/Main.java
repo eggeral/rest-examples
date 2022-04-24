@@ -54,9 +54,9 @@ public class Main {
     public static void main(String[] args) {
         try {
             List<Flight> initialFlights = Arrays.asList(
-                    new Flight(1L, "OS2001", "VIE", "DRS"),
-                    new Flight(2L, "LH1234", "GRZ", "BER"),
-                    new Flight(3L, "KM6712", "MUN", "FRA")
+                    new Flight(1L, "OS2001", "VIE", "DRS", 1L),
+                    new Flight(2L, "LH1234", "GRZ", "BER", 1L),
+                    new Flight(3L, "KM6712", "MUN", "FRA", 1L)
             );
             Server server = startServer(80, initialFlights);
 

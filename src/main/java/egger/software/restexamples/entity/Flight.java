@@ -1,7 +1,5 @@
 package egger.software.restexamples.entity;
 
-
-import egger.software.restexamples.FlightsResource;
 import egger.software.restexamples.PassengersResource;
 import org.glassfish.jersey.linking.Binding;
 import org.glassfish.jersey.linking.InjectLink;
@@ -9,34 +7,25 @@ import org.glassfish.jersey.linking.InjectLinks;
 
 import javax.ws.rs.core.Link;
 
-@InjectLinks({
-        @InjectLink(resource = PassengersResource.class, rel = "passengers"),
-        @InjectLink(
-                value = "flights/{flightId}/pilot",
-                bindings = {
-                        @Binding(name = "flightId", value = "${instance.id}")
-                },
-                rel = "pilot"
-        )
-}
-)
 public class Flight {
     private Long id;
     private String number;
     private String from;
     private String to;
 
+    private Long version;
+
     public Flight() {
     }
 
-    public Flight(Long id, String number, String from, String to) {
+    public Flight(Long id, String number, String from, String to, Long version) {
         this.id = id;
         this.number = number;
         this.from = from;
         this.to = to;
+        this.version = version;
     }
 
-    @InjectLink(resource = PassengersResource.class)
     public Link passengers;
 
     public Long getId() {
@@ -55,16 +44,18 @@ public class Flight {
         return to;
     }
 
+    public Long getVersion() { return version; }
     public Flight copy() {
-        return copy(null, null, null, null);
+        return copy(null, null, null, null, null);
     }
 
-    public Flight copy(Long newId, String newNumber, String newFrom, String newTo) {
+    public Flight copy(Long newId, String newNumber, String newFrom, String newTo, Long newVersion) {
         Long id = newId != null ? newId : this.id;
         String number = newNumber != null ? newNumber : this.number;
         String from = newFrom != null ? newFrom : this.from;
         String to = newTo != null ? newTo : this.to;
-        return new Flight(id, number, from, to);
+        Long version = newVersion != null ? newVersion : this.version;
+        return new Flight(id, number, from, to, version);
     }
 
     @Override
@@ -77,7 +68,9 @@ public class Flight {
         if (id != null ? !id.equals(flight.id) : flight.id != null) return false;
         if (number != null ? !number.equals(flight.number) : flight.number != null) return false;
         if (from != null ? !from.equals(flight.from) : flight.from != null) return false;
-        return to != null ? to.equals(flight.to) : flight.to == null;
+        if (to != null ? !to.equals(flight.to) : flight.to != null) return false;
+        if (version != null ? !version.equals(flight.version) : flight.version != null) return false;
+        return passengers != null ? passengers.equals(flight.passengers) : flight.passengers == null;
     }
 
     @Override
@@ -86,6 +79,8 @@ public class Flight {
         result = 31 * result + (number != null ? number.hashCode() : 0);
         result = 31 * result + (from != null ? from.hashCode() : 0);
         result = 31 * result + (to != null ? to.hashCode() : 0);
+        result = 31 * result + (version != null ? version.hashCode() : 0);
+        result = 31 * result + (passengers != null ? passengers.hashCode() : 0);
         return result;
     }
 
@@ -96,7 +91,8 @@ public class Flight {
                 ", number='" + number + '\'' +
                 ", from='" + from + '\'' +
                 ", to='" + to + '\'' +
+                ", version=" + version +
+                ", passengers=" + passengers +
                 '}';
     }
-
 }

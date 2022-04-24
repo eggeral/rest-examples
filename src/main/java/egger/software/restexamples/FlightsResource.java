@@ -27,7 +27,6 @@ public class FlightsResource {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public List<Flight> all(@Context SecurityContext securityContext) {
-        if (!securityContext.isUserInRole("User")) throw new WebApplicationException(Response.Status.NOT_FOUND);
         return flightsRepository.findAll();
     }
 
@@ -51,13 +50,13 @@ public class FlightsResource {
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
     public Flight replace(@PathParam("id") Long id, Flight newFlight) {
-        return flightsRepository.update(newFlight.copy(id, null, null, null));
+        return flightsRepository.update(newFlight.copy(id, null, null, null, null));
     }
 
     @DELETE
     @Path("{id}")
-    public void deleteFlight(@PathParam("id") Long id) {
-        flightsRepository.delete(id);
+    public void deleteFlight(@PathParam("id") Long id, @QueryParam("version") Long version) {
+        flightsRepository.delete(id, version);
     }
 
     @GET

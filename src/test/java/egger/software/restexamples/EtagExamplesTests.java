@@ -4,7 +4,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
-import egger.software.restexamples.entity.Flight;
 import org.eclipse.jetty.server.Server;
 import org.glassfish.jersey.client.authentication.HttpAuthenticationFeature;
 import org.junit.After;
@@ -18,13 +17,12 @@ import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.util.Arrays;
+import java.util.Collections;
 
-import static org.glassfish.jersey.client.authentication.HttpAuthenticationFeature.HTTP_AUTHENTICATION_BASIC_PASSWORD;
-import static org.glassfish.jersey.client.authentication.HttpAuthenticationFeature.HTTP_AUTHENTICATION_BASIC_USERNAME;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 
-public class QueryExamplesTests {
+public class EtagExamplesTests {
 
     private static Server server;
     private static Client client;
@@ -32,11 +30,7 @@ public class QueryExamplesTests {
 
     @Before
     public void startServer() throws Exception {
-        server = Main.startServer(port, Arrays.asList(
-                new Flight(1L, "OS2001", "VIE", "DRS"),
-                new Flight(2L, "LH1234", "GRZ", "BER"),
-                new Flight(3L, "KM6712", "MUN", "FRA")
-        ));
+        server = Main.startServer(port, Collections.emptyList());
         client = ClientBuilder.newClient();
         HttpAuthenticationFeature authenticationFeature = HttpAuthenticationFeature.basicBuilder().build();
         client.register(authenticationFeature);
@@ -49,21 +43,43 @@ public class QueryExamplesTests {
     }
 
     @Test
-    public void search_using_post() throws JsonProcessingException {
+    public void optimistic_locking_with_version_numbers() throws JsonProcessingException {
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
-        WebTarget target = client.target("http://localhost:" + port).path("/api/flights/search");
+        WebTarget target = client.target("http://localhost:" + port).path("/api/flights");
         Response response = target.request(MediaType.APPLICATION_JSON).post(Entity.entity(
                 "{" +
-                        "\"flight\": {" +
+                        "\"number\": \"OS1234\"," +
                         "\"from\": \"GRZ\"," +
                         "\"to\": \"BER\"" +
-                        "}" +
                         "}", MediaType.APPLICATION_JSON_TYPE));
         JsonNode json = objectMapper.readTree(response.readEntity(String.class));
-        assertThat(response.getStatus(), is(200));
         System.out.println(json);
-        assertThat(json.size(), is(1));
+        assertThat(response.getStatus(), is(200));
+        response = target.path("1").request(MediaType.APPLICATION_JSON).put(Entity.entity(
+                "{" +
+                        "\"number\": \"OS1234\"," +
+                        "\"from\": \"GRZ\"," +
+                        "\"to\": \"BER\"" +
+                        "}", MediaType.APPLICATION_JSON_TYPE));
+        assertThat(response.getStatus(), is(500));
+
+        response = target.path("1").request(MediaType.APPLICATION_JSON).put(Entity.entity(
+                "{" +
+                        "\"number\": \"OS1234\"," +
+                        "\"from\": \"GRZ\"," +
+                        "\"to\": \"BER\"," +
+                        "\"version\": 1" +
+                        "}", MediaType.APPLICATION_JSON_TYPE));
+        assertThat(response.getStatus(), is(200));
+        json = objectMapper.readTree(response.readEntity(String.class));
+        System.out.println(json);
+
+        response = target.path("1").request(MediaType.APPLICATION_JSON).delete();
+        assertThat(response.getStatus(), is(500));
+
+        response = target.path("1").queryParam("version", 2).request(MediaType.APPLICATION_JSON).delete();
+        assertThat(response.getStatus(), is(204));
     }
 
 }

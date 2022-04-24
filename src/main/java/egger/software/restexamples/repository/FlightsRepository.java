@@ -32,18 +32,24 @@ public class FlightsRepository {
             throw new FlightNumberAlreadyExistsException(newFlight.getNumber());
 
         Long newId = flights.stream().map(Flight::getId).max(Long::compareTo).orElse(0L) + 1;
-        Flight flight = newFlight.copy(newId, null, null, null);
+        Flight flight = newFlight.copy(newId, null, null, null, 1L);
         flights.add(flight);
         return flight;
     }
 
-    public void delete(Long id) {
+    public void delete(Long id, Long version) {
+        Flight existingFlight = findById(id);
+        if (!Objects.equals(existingFlight.getVersion(), version))
+            throw new OptimisticLockException("Flight version conflict");
         flights.removeIf(flight -> Objects.equals(flight.getId(), id));
     }
 
     public Flight update(Flight updatedFlight) {
-        delete(updatedFlight.getId());
-        Flight flight = updatedFlight.copy(updatedFlight.getId(), null, null, null);
+        Flight existingFlight = findById(updatedFlight.getId());
+        if (!Objects.equals(existingFlight.getVersion(), updatedFlight.getVersion()))
+            throw new OptimisticLockException("Flight version conflict");
+        delete(updatedFlight.getId(), updatedFlight.getVersion());
+        Flight flight = updatedFlight.copy(updatedFlight.getId(), null, null, null, existingFlight.getVersion() + 1);
         flights.add(flight);
         return flight;
     }
