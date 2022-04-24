@@ -1,4 +1,4 @@
-package egger.software.restexamples.repository;
+package repository;
 
 import egger.software.restexamples.entity.Passenger;
 

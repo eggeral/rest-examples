@@ -2,11 +2,9 @@ package egger.software.restexamples;
 
 import egger.software.restexamples.entity.Flight;
 import egger.software.restexamples.entity.Query;
-import egger.software.restexamples.repository.FlightsRepository;
-import egger.software.restexamples.repository.PassengersRepository;
+import repository.FlightsRepository;
+import repository.PassengersRepository;
 
-import javax.annotation.security.PermitAll;
-import javax.annotation.security.RolesAllowed;
 import javax.inject.Inject;
 import javax.ws.rs.*;
 import javax.ws.rs.core.*;

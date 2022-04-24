@@ -1,6 +1,6 @@
 package egger.software.restexamples;
 
-import egger.software.restexamples.repository.FlightNumberAlreadyExistsException;
+import repository.FlightNumberAlreadyExistsException;
 
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.ExceptionMapper;

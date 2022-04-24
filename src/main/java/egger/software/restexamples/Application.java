@@ -2,8 +2,8 @@ package egger.software.restexamples;
 
 import com.fasterxml.jackson.jaxrs.xml.JacksonJaxbXMLProvider;
 import egger.software.restexamples.entity.Flight;
-import egger.software.restexamples.repository.FlightsRepository;
-import egger.software.restexamples.repository.PassengersRepository;
+import repository.FlightsRepository;
+import repository.PassengersRepository;
 import io.swagger.v3.jaxrs2.integration.resources.OpenApiResource;
 import org.glassfish.jersey.internal.inject.AbstractBinder;
 import org.glassfish.jersey.linking.DeclarativeLinkingFeature;

@@ -15,4 +15,5 @@ public interface Person {
     Long getId();
 
     String getName();
+
 }

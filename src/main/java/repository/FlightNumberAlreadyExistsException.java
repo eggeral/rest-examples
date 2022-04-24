@@ -1,4 +1,4 @@
-package egger.software.restexamples.repository;
+package repository;
 
 public class FlightNumberAlreadyExistsException extends RuntimeException {
     public FlightNumberAlreadyExistsException(String number) {
